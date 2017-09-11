@@ -102,7 +102,7 @@ class BigfixConnector(BaseConnector):
         try:
             resp_json = xmltodict.parse(r.text)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(str(e))), None)
 
         if r.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, resp_json)
