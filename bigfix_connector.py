@@ -328,8 +328,6 @@ class BigfixConnector(BaseConnector):
                 for computer in computer_list:
                     etree.SubElement(target_node, 'ComputerID').text = computer.strip()
 
-        print etree.tostring(root, pretty_print=True)
-
         ret_val, response = self._make_rest_call('actions', action_result, body=etree.tostring(root), method='post')
 
         if phantom.is_fail(ret_val):
