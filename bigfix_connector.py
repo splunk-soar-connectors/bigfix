@@ -308,13 +308,13 @@ class BigfixConnector(BaseConnector):
         action = param['action_id']
         computers = param.get('computer_ids')
 
-        namespaces = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance', 'xsd': 'http://www.w3.org/2001/XMLSchema'}
-        root = etree.Element('BES', nsmap=namespaces, SkipUI='true')
+        namespaces = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
+        root = etree.Element('BES', nsmap=namespaces, attrib={'{%s}noNamespaceSchemaLocation' % 'http://www.w3.org/2001/XMLSchema-instance': 'BES.xsd'})
         action_node = etree.SubElement(root, 'SourcedFixletAction')
         fixlet_node = etree.SubElement(action_node, 'SourceFixlet')
 
-        etree.SubElement(fixlet_node, 'FixletID').text = str(fixlet)
         etree.SubElement(fixlet_node, 'Sitename').text = site
+        etree.SubElement(fixlet_node, 'FixletID').text = str(fixlet)
         etree.SubElement(fixlet_node, 'Action').text = action
 
         if computers:
@@ -327,6 +327,8 @@ class BigfixConnector(BaseConnector):
                 computer_list = computers.split(',')
                 for computer in computer_list:
                     etree.SubElement(target_node, 'ComputerID').text = computer.strip()
+
+        print etree.tostring(root, pretty_print=True)
 
         ret_val, response = self._make_rest_call('actions', action_result, body=etree.tostring(root), method='post')
 
