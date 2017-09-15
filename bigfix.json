@@ -73,7 +73,8 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Num sites: 6"
+                        "Num sites: 6",
+                        "Num sites: 11"
                     ]
                 },
                 {
@@ -156,7 +157,43 @@
                     "data_path": "action_result.summary.num_sites",
                     "data_type": "numeric",
                     "example_values": [
-                        6
+                        6,
+                        11
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Sites.*.Subscription.CustomGroup.@JoinByIntersection",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Sites.*.Subscription.CustomGroup.SearchComponentPropertyReference.Relevance",
+                    "data_type": "string",
+                    "example_values": [
+                        "exists (computer name) whose (it as string as lowercase contains \"ibm-bfe-t\" as lowercase)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Sites.*.Subscription.CustomGroup.SearchComponentPropertyReference.@Comparison",
+                    "data_type": "string",
+                    "example_values": [
+                        "Contains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Sites.*.Subscription.CustomGroup.SearchComponentPropertyReference.SearchText",
+                    "data_type": "string",
+                    "example_values": [
+                        "ibm-bfe-t"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Sites.*.Subscription.CustomGroup.SearchComponentPropertyReference.@PropertyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Computer Name"
                     ]
                 }
             ],
