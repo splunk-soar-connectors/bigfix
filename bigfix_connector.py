@@ -132,6 +132,10 @@ class BigfixConnector(BaseConnector):
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
 
+        #deal with issuse were BigFix does not add a content-Type but is XML response
+        if '<?xml' in r.text:
+            return self._process_xml_response(r, action_result)
+
         # it's not content-type that is to be parsed, handle an empty response
         if not r.text:
             return self._process_empty_reponse(r, action_result)
@@ -203,6 +207,25 @@ class BigfixConnector(BaseConnector):
             parsed_sites.append(site_data)
 
         return parsed_sites
+
+    def _handle_query_endpoints(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        hostname = param['hostname']
+        endpoint_uri = "query?relevance=id of bes computers whose (name of it as lowercase = \"{0}\" as lowercase)".format(
+            hostname)
+        ret_val, response = self._make_rest_call(endpoint_uri, action_result, method='get')
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        summary = response['BESAPI']['Query']['Result']['Answer']
+        computer_id = {'ID': summary['#text']}
+        action_result.add_data(computer_id)
+        action_result.append_to_message(summary['#text'])
+
+        return action_result.set_status(phantom.APP_SUCCESS, status_message=summary['#text'])
 
     def _handle_list_sites(self, param):
 
@@ -366,6 +389,8 @@ class BigfixConnector(BaseConnector):
             ret_val = self._handle_list_endpoints(param)
         elif action_id == 'run_action':
             ret_val = self._handle_run_action(param)
+        elif action_id == 'query_host':
+            ret_val = self._handle_query_endpoints(param)
 
         return ret_val
 
