@@ -132,7 +132,7 @@ class BigfixConnector(BaseConnector):
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, action_result)
 
-        #deal with issuse were BigFix does not add a content-Type but is XML response
+        # deal with issuse were BigFix does not add a content-Type but is XML response
         if '<?xml' in r.text:
             return self._process_xml_response(r, action_result)
 
@@ -219,13 +219,13 @@ class BigfixConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
-
-        summary = response['BESAPI']['Query']['Result']['Answer']
-        computer_id = {'ID': summary['#text']}
-        action_result.add_data(computer_id)
-        action_result.append_to_message(summary['#text'])
-
-        return action_result.set_status(phantom.APP_SUCCESS, status_message=summary['#text'])
+        try:
+            summary = response['BESAPI']['Query']['Result']['Answer']
+            id = {'Answer': summary['#text']}
+            action_result.add_data(id)
+            return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully retrieved BigFix ID from Host Name")
+        except:
+            return action_result.set_status(phantom.APP_ERROR, status_message="Could not parse reply")
 
     def _handle_list_sites(self, param):
 
