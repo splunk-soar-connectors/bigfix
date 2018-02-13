@@ -916,6 +916,74 @@
                 "type": "table",
                 "height": 5
             }
+        },
+        {
+            "action": "get host",
+            "identifier": "get_host",
+            "description": "Get Bigfix ID",
+            "verbose": "Get BigFix ID from Hostname.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "hostname": {
+                    "description": "hostname",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "host name"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Answer",
+                    "data_type": "string",
+                    "example_values": [
+                        "12106585"
+                    ],
+                    "column_name": "BigFix ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "ibm-bfe-t1"
+                    ],
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "Hostname",
+                    "column_order": 1
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
         }
     ]
 }
