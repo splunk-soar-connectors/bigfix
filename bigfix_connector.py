@@ -221,8 +221,8 @@ class BigfixConnector(BaseConnector):
             return action_result.get_status()
         try:
             summary = response['BESAPI']['Query']['Result']['Answer']
-            id = {'Answer': summary['#text']}
-            action_result.add_data(id)
+            ID = {'Answer': summary['#text']}
+            action_result.add_data(ID)
             return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully retrieved BigFix ID from Host Name")
         except:
             return action_result.set_status(phantom.APP_ERROR, status_message="Could not parse reply")
@@ -389,7 +389,7 @@ class BigfixConnector(BaseConnector):
             ret_val = self._handle_list_endpoints(param)
         elif action_id == 'run_action':
             ret_val = self._handle_run_action(param)
-        elif action_id == 'query_host':
+        elif action_id == 'get_host':
             ret_val = self._handle_query_endpoints(param)
 
         return ret_val

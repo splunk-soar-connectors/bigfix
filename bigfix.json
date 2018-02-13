@@ -918,10 +918,10 @@
             }
         },
         {
-            "action": "query host",
-            "identifier": "query_host",
-            "description": "Query Hostname",
-            "verbose": "Query BigFix ID from Hostname.",
+            "action": "get host",
+            "identifier": "get_host",
+            "description": "Get Bigfix ID",
+            "verbose": "Get BigFix ID from Hostname.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -929,18 +929,13 @@
                     "description": "hostname",
                     "data_type": "string",
                     "order": 0,
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "host name"
+                    ]
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_order": 0,
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
