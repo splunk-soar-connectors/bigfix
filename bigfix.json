@@ -9,7 +9,7 @@
     "product_name": "BigFix",
     "product_version_regex": ".*",
     "publisher": "Phantom",
-    "license": "Copyright Phantom 2017",
+    "license": "Copyright (c) Phantom Cyber Corporation 2017-2018",
     "app_version": "1.0.7",
     "utctime_updated": "2018-02-23T00:09:38.000000Z",
     "package_name": "phantom_bigfix",
@@ -937,6 +937,13 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.hostname",
                     "data_type": "string",
