@@ -383,6 +383,8 @@ class BigfixConnector(BaseConnector):
             ret_val = self._handle_test_connectivity(param)
         elif action_id == 'list_sites':
             ret_val = self._handle_list_sites(param)
+        elif action_id == 'list_device_groups':
+            ret_val = self._handle_list_sites(param)
         elif action_id == 'list_fixlets':
             ret_val = self._handle_list_fixlets(param)
         elif action_id == 'list_endpoints':
