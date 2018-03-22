@@ -57,7 +57,7 @@
         {
             "action": "list sites",
             "identifier": "list_sites",
-            "description": "List all sites on the system",
+            "description": "List all sites on the system (DEPRECATED)",
             "verbose": "DEPRECATED: Please use <b>list device groups</b> instead.",
             "type": "test",
             "deprecated": true,
