@@ -580,6 +580,9 @@
                     "column_order": 1,
                     "example_values": [
                         "IBM-BFE-01"
+                    ],
+                    "contains": [
+                        "host name"
                     ]
                 },
                 {
@@ -594,6 +597,9 @@
                     "data_type": "string",
                     "example_values": [
                         "ibm-bfe-01.lab.phantominternal.net"
+                    ],
+                    "contains": [
+                        "host name"
                     ]
                 },
                 {
@@ -932,6 +938,7 @@
                     "data_type": "string",
                     "order": 0,
                     "required": true,
+                    "primary": true,
                     "contains": [
                         "host name"
                     ]
