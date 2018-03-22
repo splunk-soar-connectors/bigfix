@@ -60,6 +60,7 @@
             "description": "List all sites on the system",
             "verbose": "DEPRECATED: Please use <b>list device groups</b> instead.",
             "type": "test",
+            "deprecated": true,
             "read_only": true,
             "parameters": {},
             "output": [
@@ -205,7 +206,7 @@
         },
         {
             "action": "list device groups",
-            "identifier": "list_sites",
+            "identifier": "list_device_groups",
             "description": "List all sites on the system",
             "verbose": "",
             "type": "investigate",
