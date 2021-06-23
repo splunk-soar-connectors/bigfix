@@ -1,14 +1,10 @@
 # --
 # File: bigfix_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2017-2018
+# Copyright (c) 2017-2021 Splunk Inc.
 #
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 #
 # --
 
@@ -63,7 +59,7 @@ class BigfixConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, consts.EMPTY_RESPONSE), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -76,8 +72,8 @@ class BigfixConnector(BaseConnector):
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except:
-            error_text = "Cannot parse error details"
+        except Exception:
+            error_text = consts.CANNOT_PARSE_ERROR
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
                 error_text)
@@ -92,9 +88,32 @@ class BigfixConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, {'response': r.text})
 
         message = "Error from server: {0}".format(
-                r.text.replace('{', '{{').replace('}', '}}'))
-
+            r.text.replace('{', '{{').replace('}', '}}'))
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _get_error_message_from_exception(self, e):
+        """ This function is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_msg = consts.ERROR_MSG_EXCEPTIOIN
+        error_code = consts.ERROR_CODE_EXCEPTION
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = consts.ERROR_CODE_EXCEPTION
+                    error_msg = e.args[0]
+            else:
+                error_code = consts.ERROR_CODE_EXCEPTION
+                error_msg = consts.ERROR_MSG_EXCEPTIOIN
+        except Exception:
+            error_code = consts.ERROR_CODE_EXCEPTION
+            error_msg = consts.ERROR_MSG_EXCEPTIOIN
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _process_xml_response(self, r, action_result):
 
@@ -102,7 +121,7 @@ class BigfixConnector(BaseConnector):
         try:
             resp_json = xmltodict.parse(r.text)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
         if r.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, resp_json)
@@ -158,13 +177,13 @@ class BigfixConnector(BaseConnector):
 
         try:
             r = request_func(
-                            url,
-                            data=body,
-                            auth=self._auth,
-                            verify=self._verify,
-                            headers={'Content-Type': 'text/xml'})
+                url,
+                data=body,
+                auth=self._auth,
+                verify=self._verify,
+                headers={'Content-Type': 'text/xml'})
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), None)
 
         return self._process_response(r, action_result)
 
@@ -172,7 +191,7 @@ class BigfixConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self.save_progress("Connecting to BigFix")
+        self.save_progress(consts.BIGFIX_CONNECTING_PROGRESS)
 
         ret_val, response = self._make_rest_call('login', action_result)
 
@@ -184,7 +203,7 @@ class BigfixConnector(BaseConnector):
             self.save_progress("Test Connectivity Failed. Could not get response from server.")
             return action_result.get_status()
 
-        self.save_progress("Test Connectivity Passed")
+        self.save_progress(consts.TEST_CONNECTIVITY_PASSED)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _parse_sites(self, action_result, sites, site_type):
@@ -223,9 +242,9 @@ class BigfixConnector(BaseConnector):
             summary = response['BESAPI']['Query']['Result']['Answer']
             ID = {'Answer': summary['#text']}
             action_result.add_data(ID)
-            return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully retrieved BigFix ID from Host Name")
-        except:
-            return action_result.set_status(phantom.APP_ERROR, status_message="Could not parse reply")
+            return action_result.set_status(phantom.APP_SUCCESS, status_message=consts.SUCCESSFULLY_RETRIEVED)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, status_message=consts.COULD_NOT_PARSE)
 
     def _handle_list_sites(self, param):
 
@@ -381,8 +400,6 @@ class BigfixConnector(BaseConnector):
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
-        elif action_id == 'list_sites':
-            ret_val = self._handle_list_sites(param)
         elif action_id == 'list_device_groups':
             ret_val = self._handle_list_sites(param)
         elif action_id == 'list_fixlets':
@@ -400,11 +417,12 @@ class BigfixConnector(BaseConnector):
 if __name__ == '__main__':
 
     import sys
+
     # import pudb
     # pudb.set_trace()
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -415,6 +433,6 @@ if __name__ == '__main__':
         connector = BigfixConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
