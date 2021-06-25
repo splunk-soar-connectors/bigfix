@@ -624,8 +624,8 @@
             "identifier": "run_action",
             "description": "Deploy a patch",
             "verbose": "Create an action on BigFix that will run the given action from the given fixlet.<br><br>The <b>computer_ids</b> parameter takes a comma-separated list of BigFix computer IDs. If no computers are given, the action will be run on the default computers configured on BigFix. If the action should run on all computers set the <b>computer_ids</b> parameter to <b>all</b>.",
-            "type": "investigate",
-            "read_only": true,
+            "type": "generic",
+            "read_only": false,
             "parameters": {
                 "fixlet_id": {
                     "description": "Fixlet ID",

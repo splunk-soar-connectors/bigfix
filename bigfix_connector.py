@@ -366,7 +366,7 @@ class BigfixConnector(BaseConnector):
             if computers.strip() == 'all':
                 etree.SubElement(target_node, 'AllComputers').text = 'true'
             else:
-                computer_list = computers.split(',')
+                computer_list = list(filter(None, computers.split(',')))
                 for computer in computer_list:
                     etree.SubElement(target_node, 'ComputerID').text = computer.strip()
 
