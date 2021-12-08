@@ -789,7 +789,7 @@
             "read_only": true,
             "parameters": {
                 "hostname": {
-                    "description": "hostname",
+                    "description": "Hostname",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
