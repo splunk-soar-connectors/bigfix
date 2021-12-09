@@ -15,6 +15,7 @@
     "package_name": "phantom_bigfix",
     "main_module": "bigfix_connector.py",
     "python_version": "3",
+    "fips_compliant":true,
     "min_phantom_version": "4.9.39220",
     "latest_tested_versions": [
         "On-prem, BigFix Enterprise Server v9.5.6"
@@ -788,7 +789,7 @@
             "read_only": true,
             "parameters": {
                 "hostname": {
-                    "description": "hostname",
+                    "description": "Hostname",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
