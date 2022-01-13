@@ -2,7 +2,7 @@
 # BigFix
 
 Publisher: Splunk  
-Connector Version: 2\.0\.4  
+Connector Version: 2\.0\.7  
 Product Vendor: IBM  
 Product Name: BigFix  
 Product Version Supported (regex): "\.\*"  
