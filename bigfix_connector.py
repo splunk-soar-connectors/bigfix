@@ -1,24 +1,30 @@
-# --
 # File: bigfix_connector.py
 #
-# Copyright (c) 2017-2021 Splunk Inc.
+# Copyright (c) 2017-2022 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# --
-
-# Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-
-import bigfix_consts as consts
-import xmltodict
-import requests
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
+#
+#
 import json
+
+import phantom.app as phantom
+import requests
+import xmltodict
 from bs4 import BeautifulSoup
 from lxml import etree
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+
+import bigfix_consts as consts
 
 
 class RetVal(tuple):
@@ -121,7 +127,8 @@ class BigfixConnector(BaseConnector):
         try:
             resp_json = xmltodict.parse(r.text)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(self._get_error_message_from_exception(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(
+                self._get_error_message_from_exception(e))), None)
 
         if r.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, resp_json)
@@ -183,7 +190,8 @@ class BigfixConnector(BaseConnector):
                 verify=self._verify,
                 headers={'Content-Type': 'text/xml'})
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
+                self._get_error_message_from_exception(e))), None)
 
         return self._process_response(r, action_result)
 
@@ -351,7 +359,8 @@ class BigfixConnector(BaseConnector):
         computers = param.get('computer_ids')
 
         namespaces = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
-        root = etree.Element('BES', nsmap=namespaces, attrib={'{%s}noNamespaceSchemaLocation' % 'http://www.w3.org/2001/XMLSchema-instance': 'BES.xsd'})
+        root = etree.Element('BES', nsmap=namespaces, attrib={
+            '{%s}noNamespaceSchemaLocation' % 'http://www.w3.org/2001/XMLSchema-instance': 'BES.xsd'})
         action_node = etree.SubElement(root, 'SourcedFixletAction')
         fixlet_node = etree.SubElement(action_node, 'SourceFixlet')
 
@@ -377,7 +386,8 @@ class BigfixConnector(BaseConnector):
 
         spawned_action = response.get('BESAPI', {}).get('Action')
         if not spawned_action:
-            return action_result.set_status(phantom.APP_ERROR, "Could not start action on BigFix. Return data:\n\n{0}".format(response.replace('{', '{{').replace('}', '}}')))
+            return action_result.set_status(phantom.APP_ERROR, "Could not start action on BigFix. Return data:\n\n{0}".format(
+                response.replace('{', '{{').replace('}', '}}')))
 
         spawned_action['Resource'] = spawned_action.pop('@Resource')
         spawned_action['LastModified'] = spawned_action.pop('@LastModified')
