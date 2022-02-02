@@ -2,11 +2,11 @@
 # BigFix
 
 Publisher: Splunk  
-Connector Version: 2\.0\.7  
+Connector Version: 2\.0\.9  
 Product Vendor: IBM  
 Product Name: BigFix  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.9\.39220  
+Minimum Product Version: 5\.1\.0  
 
 This app supports several investigative actions on IBM Big Fix
 
