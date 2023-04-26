@@ -2,11 +2,11 @@
 # BigFix
 
 Publisher: Splunk  
-Connector Version: 2\.0\.9  
+Connector Version: 2.0.9  
 Product Vendor: IBM  
 Product Name: BigFix  
-Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.1\.0  
+Product Version Supported (regex): ".\*"  
+Minimum Product Version: 5.1.0  
 
 This app supports several investigative actions on IBM Big Fix
 
@@ -16,7 +16,7 @@ The below configuration variables are required for this Connector to operate.  T
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **url** |  required  | string | URL including port
-**verify\_server\_cert** |  optional  | boolean | Verify server certificate
+**verify_server_cert** |  optional  | boolean | Verify server certificate
 **username** |  required  | string | Username
 **password** |  required  | password | Password
 
@@ -50,25 +50,25 @@ Read only: **True**
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data\.\*\.Sites\.\*\.Description | string | 
-action\_result\.data\.\*\.Sites\.\*\.Domain | string |  `domain` 
-action\_result\.data\.\*\.Sites\.\*\.GatherURL | string |  `url` 
-action\_result\.data\.\*\.Sites\.\*\.GlobalReadPermission | string | 
-action\_result\.data\.\*\.Sites\.\*\.Name | string |  `bigfix site` 
-action\_result\.data\.\*\.Sites\.\*\.Subscription\.CustomGroup\.\@JoinByIntersection | string | 
-action\_result\.data\.\*\.Sites\.\*\.Subscription\.CustomGroup\.SearchComponentPropertyReference\.\@Comparison | string | 
-action\_result\.data\.\*\.Sites\.\*\.Subscription\.CustomGroup\.SearchComponentPropertyReference\.\@PropertyName | string | 
-action\_result\.data\.\*\.Sites\.\*\.Subscription\.CustomGroup\.SearchComponentPropertyReference\.Relevance | string | 
-action\_result\.data\.\*\.Sites\.\*\.Subscription\.CustomGroup\.SearchComponentPropertyReference\.SearchText | string | 
-action\_result\.data\.\*\.Sites\.\*\.Subscription\.Mode | string | 
-action\_result\.data\.\*\.Sites\.\*\.Type | string | 
-action\_result\.summary\.num\_sites | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.Sites.\*.Description | string |  |   Clients that you can do destructive testing with 
+action_result.data.\*.Sites.\*.Domain | string |  `domain`  |   BES 
+action_result.data.\*.Sites.\*.GatherURL | string |  `url`  |   http://demo.value.com/cgi-bin/bfgather/bessupport 
+action_result.data.\*.Sites.\*.GlobalReadPermission | string |  |   true 
+action_result.data.\*.Sites.\*.Name | string |  `bigfix site`  |   BES Support 
+action_result.data.\*.Sites.\*.Subscription.CustomGroup.@JoinByIntersection | string |  |   false 
+action_result.data.\*.Sites.\*.Subscription.CustomGroup.SearchComponentPropertyReference.@Comparison | string |  |   Contains 
+action_result.data.\*.Sites.\*.Subscription.CustomGroup.SearchComponentPropertyReference.@PropertyName | string |  |   Computer Name 
+action_result.data.\*.Sites.\*.Subscription.CustomGroup.SearchComponentPropertyReference.Relevance | string |  |   exists (computer name) whose (it as string as lowercase contains "ibm-bfe-t" as lowercase) 
+action_result.data.\*.Sites.\*.Subscription.CustomGroup.SearchComponentPropertyReference.SearchText | string |  |   ibm-bfe-t 
+action_result.data.\*.Sites.\*.Subscription.Mode | string |  |   All 
+action_result.data.\*.Sites.\*.Type | string |  |   ExternalSite 
+action_result.summary.num_sites | numeric |  |   6  11 
+action_result.message | string |  |   Num sites: 6  Num sites: 11 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list patches'
 List patches from a site
@@ -76,28 +76,28 @@ List patches from a site
 Type: **investigate**  
 Read only: **True**
 
-This action lists all fixlets on a given site\.
+This action lists all fixlets on a given site.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**site\_name** |  required  | Site Name | string |  `bigfix site` 
-**site\_type** |  required  | Site Type | string | 
+**site_name** |  required  | Site Name | string |  `bigfix site` 
+**site_type** |  required  | Site Type | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.site\_name | string |  `bigfix site` 
-action\_result\.parameter\.site\_type | string | 
-action\_result\.data\.\*\.Fixlets\.\*\.ID | string | 
-action\_result\.data\.\*\.Fixlets\.\*\.LastModified | string | 
-action\_result\.data\.\*\.Fixlets\.\*\.Name | string | 
-action\_result\.data\.\*\.Fixlets\.\*\.Resource | string |  `url` 
-action\_result\.summary\.num\_fixlets | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.site_name | string |  `bigfix site`  |   BES Support 
+action_result.parameter.site_type | string |  |   external 
+action_result.data.\*.Fixlets.\*.ID | string |  |   1 
+action_result.data.\*.Fixlets.\*.LastModified | string |  |   Tue, 29 Aug 2017 15:45:59 +0000 
+action_result.data.\*.Fixlets.\*.Name | string |  |   BES Clients in Seat Count Grace Mode 
+action_result.data.\*.Fixlets.\*.Resource | string |  `url`  |   https://10.16.0.136:52311/api/fixlet/external/BES%20Support/1 
+action_result.summary.num_fixlets | numeric |  |   910 
+action_result.message | string |  |   Num fixlets: 910 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list endpoints'
 List all endpoints connected to the system
@@ -109,43 +109,43 @@ Read only: **True**
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data\.\*\.\@Resource | string |  `url` 
-action\_result\.data\.\*\.Active Directory Path | string | 
-action\_result\.data\.\*\.Agent Type | string | 
-action\_result\.data\.\*\.Agent Version | string |  `ip` 
-action\_result\.data\.\*\.BES Relay Selection Method | string | 
-action\_result\.data\.\*\.BES Relay Service Installed | string | 
-action\_result\.data\.\*\.BES Root Server | string | 
-action\_result\.data\.\*\.BIOS | string | 
-action\_result\.data\.\*\.CPU | string | 
-action\_result\.data\.\*\.Client Settings | string | 
-action\_result\.data\.\*\.Computer Name | string |  `host name` 
-action\_result\.data\.\*\.Computer Type | string | 
-action\_result\.data\.\*\.DNS Name | string |  `host name` 
-action\_result\.data\.\*\.Device Type | string | 
-action\_result\.data\.\*\.Distance to BES Relay | string | 
-action\_result\.data\.\*\.Free Space on System Drive | string | 
-action\_result\.data\.\*\.ID | string | 
-action\_result\.data\.\*\.IP Address | string |  `ip` 
-action\_result\.data\.\*\.Last Report Time | string | 
-action\_result\.data\.\*\.License Type | string | 
-action\_result\.data\.\*\.Locked | string | 
-action\_result\.data\.\*\.OS | string | 
-action\_result\.data\.\*\.RAM | string | 
-action\_result\.data\.\*\.Relay | string | 
-action\_result\.data\.\*\.Relay Name of Client | string | 
-action\_result\.data\.\*\.Setting\.\@Resource | string | 
-action\_result\.data\.\*\.Subnet Address | string |  `ip` 
-action\_result\.data\.\*\.Subscribed Sites | string |  `url` 
-action\_result\.data\.\*\.Total Size of System Drive | string | 
-action\_result\.data\.\*\.User Name | string | 
-action\_result\.summary\.num\_endpoints | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.@Resource | string |  `url`  |   https://10.16.0.136:52311/api/computer/3146683 
+action_result.data.\*.Active Directory Path | string |  |   <none> 
+action_result.data.\*.Agent Type | string |  |   Native 
+action_result.data.\*.Agent Version | string |  `ip`  |   9.5.6.63 
+action_result.data.\*.BES Relay Selection Method | string |  |   Automatic 
+action_result.data.\*.BES Relay Service Installed | string |  |   BES Root Server 
+action_result.data.\*.BES Root Server | string |  |   ibm-bfe-01.lab.phantominternal.net (0) 
+action_result.data.\*.BIOS | string |  |   09/21/15 
+action_result.data.\*.CPU | string |  |   2200 MHz Xeon 
+action_result.data.\*.Client Settings | string |  |   __Relay_Control_Server2= 
+action_result.data.\*.Computer Name | string |  `host name`  |   IBM-BFE-01 
+action_result.data.\*.Computer Type | string |  |   Virtual 
+action_result.data.\*.DNS Name | string |  `host name`  |   ibm-bfe-01.lab.phantominternal.net 
+action_result.data.\*.Device Type | string |  |   Server 
+action_result.data.\*.Distance to BES Relay | string |  |   0 
+action_result.data.\*.Free Space on System Drive | string |  |   30542 MB 
+action_result.data.\*.ID | string |  |   3146683 
+action_result.data.\*.IP Address | string |  `ip`  |   10.16.0.136 
+action_result.data.\*.Last Report Time | string |  |   Thu, 31 Aug 2017 23:41:01 +0000 
+action_result.data.\*.License Type | string |  |   Windows Server 
+action_result.data.\*.Locked | string |  |   Yes 
+action_result.data.\*.OS | string |  |   Win2012R2 6.3.9600 
+action_result.data.\*.RAM | string |  |   4096 MB 
+action_result.data.\*.Relay | string |  |   BES Root Server 
+action_result.data.\*.Relay Name of Client | string |  |   ibm-bfe-01.lab.phantominternal.net 
+action_result.data.\*.Setting.@Resource | string |  |   api/computer/3146683/ 
+action_result.data.\*.Subnet Address | string |  `ip`  |   10.16.0.0 
+action_result.data.\*.Subscribed Sites | string |  `url`  |   http://ibm-bfe-01.lab.phantominternal.net:52311/cgi-bin/bfgather.exe/mailboxsite3146683 
+action_result.data.\*.Total Size of System Drive | string |  |   50847 MB 
+action_result.data.\*.User Name | string |  |   Administrator 
+action_result.summary.num_endpoints | numeric |  |   1 
+action_result.message | string |  |   Num endpoints: 1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'deploy patch'
 Deploy a patch
@@ -153,32 +153,32 @@ Deploy a patch
 Type: **generic**  
 Read only: **False**
 
-Create an action on BigFix that will run the given action from the given fixlet\.<br><br>The <b>computer\_ids</b> parameter takes a comma\-separated list of BigFix computer IDs\. If no computers are given, the action will be run on the default computers configured on BigFix\. If the action should run on all computers set the <b>computer\_ids</b> parameter to <b>all</b>\.
+Create an action on BigFix that will run the given action from the given fixlet.<br><br>The <b>computer_ids</b> parameter takes a comma-separated list of BigFix computer IDs. If no computers are given, the action will be run on the default computers configured on BigFix. If the action should run on all computers set the <b>computer_ids</b> parameter to <b>all</b>.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**fixlet\_id** |  required  | Fixlet ID | numeric |  `bigfix fixlet id` 
-**action\_id** |  required  | Action ID | string | 
-**site\_name** |  required  | Site Name | string |  `bigfix site` 
-**computer\_ids** |  optional  | Target Computer IDs | string |  `bigfix computer id` 
+**fixlet_id** |  required  | Fixlet ID | numeric |  `bigfix fixlet id` 
+**action_id** |  required  | Action ID | string | 
+**site_name** |  required  | Site Name | string |  `bigfix site` 
+**computer_ids** |  optional  | Target Computer IDs | string |  `bigfix computer id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.action\_id | string | 
-action\_result\.parameter\.computer\_ids | string |  `bigfix computer id` 
-action\_result\.parameter\.fixlet\_id | numeric |  `bigfix fixlet id` 
-action\_result\.parameter\.site\_name | string |  `bigfix site` 
-action\_result\.data\.\*\.Action\.ID | string | 
-action\_result\.data\.\*\.Action\.LastModified | string | 
-action\_result\.data\.\*\.Action\.Name | string | 
-action\_result\.data\.\*\.Action\.Resource | string |  `url` 
-action\_result\.summary\.spawned\_action\_id | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.action_id | string |  |   Action1 
+action_result.parameter.computer_ids | string |  `bigfix computer id`  |   12106585 
+action_result.parameter.fixlet_id | numeric |  `bigfix fixlet id`  |   56 
+action_result.parameter.site_name | string |  `bigfix site`  |   Test Site 1 
+action_result.data.\*.Action.ID | string |  |   65 
+action_result.data.\*.Action.LastModified | string |  |   Thu, 07 Sep 2017 22:55:38 +0000 
+action_result.data.\*.Action.Name | string |  |   Test Fixlet 1 
+action_result.data.\*.Action.Resource | string |  `url`  |   https://10.16.0.136:52311/api/action/65 
+action_result.summary.spawned_action_id | string |  |   65 
+action_result.message | string |  |   Action id: 65 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get host'
 Get Bigfix ID
@@ -186,7 +186,7 @@ Get Bigfix ID
 Type: **investigate**  
 Read only: **True**
 
-Get BigFix ID from Hostname\.
+Get BigFix ID from Hostname.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -194,12 +194,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **hostname** |  required  | Hostname | string |  `host name` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.hostname | string |  `host name` 
-action\_result\.data\.\*\.Answer | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.hostname | string |  `host name`  |   ibm-bfe-t1 
+action_result.data.\*.Answer | string |  |   12106585 
+action_result.summary | string |  |  
+action_result.message | string |  |   Successfully retrieved BigFix ID from Host Name 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
