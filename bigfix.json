@@ -9,14 +9,14 @@
     "product_name": "BigFix",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2017-2022 Splunk Inc.",
+    "license": "Copyright (c) 2017-2023 Splunk Inc.",
     "app_version": "2.0.9",
     "utctime_updated": "2022-02-02T18:28:12.000000Z",
     "package_name": "phantom_bigfix",
     "main_module": "bigfix_connector.py",
     "python_version": "3",
     "fips_compliant": true,
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "5.5.0",
     "latest_tested_versions": [
         "On-prem, BigFix Enterprise Server v9.5.6"
     ],
@@ -881,7 +881,7 @@
             },
             {
                 "module": "lxml",
-                "input_file": "wheels/py36/lxml-4.6.3-cp36-cp36m-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+                "input_file": "wheels/py36/lxml-4.9.2-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl"
             },
             {
                 "module": "requests",
@@ -921,7 +921,7 @@
             },
             {
                 "module": "lxml",
-                "input_file": "wheels/py39/lxml-4.6.3-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+                "input_file": "wheels/py39/lxml-4.9.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl"
             },
             {
                 "module": "requests",
