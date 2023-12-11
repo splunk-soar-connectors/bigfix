@@ -235,7 +235,7 @@ class BigfixConnector(BaseConnector):
 
         return parsed_sites
 
-    def _handle_query_endpoints(self, param):
+    def _handle_get_host(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -255,7 +255,7 @@ class BigfixConnector(BaseConnector):
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, status_message=consts.COULD_NOT_PARSE)
 
-    def _handle_list_sites(self, param):
+    def _handle_list_device_groups(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -415,7 +415,7 @@ class BigfixConnector(BaseConnector):
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
         elif action_id == 'list_device_groups':
-            ret_val = self._handle_list_sites(param)
+            ret_val = self._handle_list_device_groups(param)
         elif action_id == 'list_fixlets':
             ret_val = self._handle_list_fixlets(param)
         elif action_id == 'list_endpoints':
@@ -423,7 +423,7 @@ class BigfixConnector(BaseConnector):
         elif action_id == 'run_action':
             ret_val = self._handle_run_action(param)
         elif action_id == 'get_host':
-            ret_val = self._handle_query_endpoints(param)
+            ret_val = self._handle_get_host(param)
 
         return ret_val
 
