@@ -287,7 +287,7 @@ class BigfixConnector(BaseConnector):
 
         site_name = param['site_name']
         site_type = param['site_type']
-
+        self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call('fixlets/{0}/{1}'.format(site_type, site_name), action_result)
 
         if (phantom.is_fail(ret_val)):
@@ -328,6 +328,7 @@ class BigfixConnector(BaseConnector):
         for computer in computers:
 
             comp_id = computer['ID']
+            self.debug_print("Making rest call")
             ret_val, response = self._make_rest_call('computer/{0}'.format(comp_id), action_result)
 
             if (phantom.is_fail(ret_val)):
@@ -379,6 +380,7 @@ class BigfixConnector(BaseConnector):
                 for computer in computer_list:
                     etree.SubElement(target_node, 'ComputerID').text = computer.strip()
 
+        self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call('actions', action_result, body=etree.tostring(root), method='post')
 
         if phantom.is_fail(ret_val):
