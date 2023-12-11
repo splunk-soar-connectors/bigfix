@@ -242,6 +242,7 @@ class BigfixConnector(BaseConnector):
         hostname = param['hostname']
         endpoint_uri = "query?relevance=id of bes computers whose (name of it as lowercase = \"{0}\" as lowercase)".format(
             hostname)
+        self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call(endpoint_uri, action_result, method='get')
 
         if (phantom.is_fail(ret_val)):
@@ -259,6 +260,7 @@ class BigfixConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call('sites', action_result)
 
         if (phantom.is_fail(ret_val)):
