@@ -1,6 +1,6 @@
 # File: bigfix_connector.py
 #
-# Copyright (c) 2017-2023 Splunk Inc.
+# Copyright (c) 2017-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -235,13 +235,14 @@ class BigfixConnector(BaseConnector):
 
         return parsed_sites
 
-    def _handle_query_endpoints(self, param):
+    def _handle_get_host(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         hostname = param['hostname']
         endpoint_uri = "query?relevance=id of bes computers whose (name of it as lowercase = \"{0}\" as lowercase)".format(
             hostname)
+        self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call(endpoint_uri, action_result, method='get')
 
         if (phantom.is_fail(ret_val)):
@@ -254,11 +255,12 @@ class BigfixConnector(BaseConnector):
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, status_message=consts.COULD_NOT_PARSE)
 
-    def _handle_list_sites(self, param):
+    def _handle_list_device_groups(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call('sites', action_result)
 
         if (phantom.is_fail(ret_val)):
@@ -287,7 +289,7 @@ class BigfixConnector(BaseConnector):
 
         site_name = param['site_name']
         site_type = param['site_type']
-
+        self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call('fixlets/{0}/{1}'.format(site_type, site_name), action_result)
 
         if (phantom.is_fail(ret_val)):
@@ -328,6 +330,7 @@ class BigfixConnector(BaseConnector):
         for computer in computers:
 
             comp_id = computer['ID']
+            self.debug_print("Making rest call")
             ret_val, response = self._make_rest_call('computer/{0}'.format(comp_id), action_result)
 
             if (phantom.is_fail(ret_val)):
@@ -379,6 +382,7 @@ class BigfixConnector(BaseConnector):
                 for computer in computer_list:
                     etree.SubElement(target_node, 'ComputerID').text = computer.strip()
 
+        self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call('actions', action_result, body=etree.tostring(root), method='post')
 
         if phantom.is_fail(ret_val):
@@ -411,7 +415,7 @@ class BigfixConnector(BaseConnector):
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
         elif action_id == 'list_device_groups':
-            ret_val = self._handle_list_sites(param)
+            ret_val = self._handle_list_device_groups(param)
         elif action_id == 'list_fixlets':
             ret_val = self._handle_list_fixlets(param)
         elif action_id == 'list_endpoints':
@@ -419,7 +423,7 @@ class BigfixConnector(BaseConnector):
         elif action_id == 'run_action':
             ret_val = self._handle_run_action(param)
         elif action_id == 'get_host':
-            ret_val = self._handle_query_endpoints(param)
+            ret_val = self._handle_get_host(param)
 
         return ret_val
 
