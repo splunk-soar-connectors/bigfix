@@ -6,7 +6,7 @@ Connector Version: 2.0.11
 Product Vendor: IBM  
 Product Name: BigFix  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.5.0  
+Minimum Product Version: 6.2.1  
 
 This app supports several investigative actions on IBM Big Fix
 

@@ -48,9 +48,9 @@ class BigfixConnector(BaseConnector):
 
         config = self.get_config()
 
-        self._base_url = config['url'] + ('api/' if config['url'].endswith('/') else '/api/')
-        self._auth = (config['username'], config['password'])
-        self._verify = config['verify_server_cert']
+        self._base_url = config["url"] + ("api/" if config["url"].endswith("/") else "/api/")
+        self._auth = (config["username"], config["password"])
+        self._verify = config["verify_server_cert"]
         self._state = self.load_state()
 
         return phantom.APP_SUCCESS
@@ -75,30 +75,28 @@ class BigfixConnector(BaseConnector):
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
-            split_lines = error_text.split('\n')
+            split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
+            error_text = "\n".join(split_lines)
         except Exception:
             error_text = consts.CANNOT_PARSE_ERROR
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace('{', '{{').replace('}', '}}')
+        message = message.replace("{", "{{").replace("}", "}}")
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_text_response(self, r, action_result):
 
         if r.status_code == 200:
-            return RetVal(phantom.APP_SUCCESS, {'response': r.text})
+            return RetVal(phantom.APP_SUCCESS, {"response": r.text})
 
-        message = "Error from server: {0}".format(
-            r.text.replace('{', '{{').replace('}', '}}'))
+        message = "Error from server: {0}".format(r.text.replace("{", "{{").replace("}", "}}"))
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _get_error_message_from_exception(self, e):
-        """ This function is used to get appropriate error message from the exception.
+        """This function is used to get appropriate error message from the exception.
         :param e: Exception object
         :return: error message
         """
@@ -127,39 +125,42 @@ class BigfixConnector(BaseConnector):
         try:
             resp_json = xmltodict.parse(r.text)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(
-                self._get_error_message_from_exception(e))), None)
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(self._get_error_message_from_exception(e))
+                ),
+                None,
+            )
 
         if r.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+        message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
 
         # store the r_text in debug data, it will get dumped in the logs if the action fails
-        if hasattr(action_result, 'add_debug_data'):
-            action_result.add_debug_data({'r_status_code': r.status_code})
-            action_result.add_debug_data({'r_text': r.text})
-            action_result.add_debug_data({'r_headers': r.headers})
+        if hasattr(action_result, "add_debug_data"):
+            action_result.add_debug_data({"r_status_code": r.status_code})
+            action_result.add_debug_data({"r_text": r.text})
+            action_result.add_debug_data({"r_headers": r.headers})
 
         # Process an xml response
-        if 'xml' in r.headers.get('Content-Type', ''):
+        if "xml" in r.headers.get("Content-Type", ""):
             return self._process_xml_response(r, action_result)
 
         # Process a plain-text response
-        if 'plain' in r.headers.get('Content-Type', ''):
+        if "plain" in r.headers.get("Content-Type", ""):
             return self._process_text_response(r, action_result)
 
         # Process an HTML resonse
-        if 'html' in r.headers.get('Content-Type', ''):
+        if "html" in r.headers.get("Content-Type", ""):
             return self._process_html_response(r, action_result)
 
         # deal with issuse were BigFix does not add a content-Type but is XML response
-        if '<?xml' in r.text:
+        if "<?xml" in r.text:
             return self._process_xml_response(r, action_result)
 
         # it's not content-type that is to be parsed, handle an empty response
@@ -168,7 +169,8 @@ class BigfixConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+            r.status_code, r.text.replace("{", "{{").replace("}", "}}")
+        )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -183,15 +185,14 @@ class BigfixConnector(BaseConnector):
         url = self._base_url + endpoint
 
         try:
-            r = request_func(
-                url,
-                data=body,
-                auth=self._auth,
-                verify=self._verify,
-                headers={'Content-Type': 'text/xml'})
+            r = request_func(url, data=body, auth=self._auth, verify=self._verify, headers={"Content-Type": "text/xml"})
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
-                self._get_error_message_from_exception(e))), None)
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))
+                ),
+                None,
+            )
 
         return self._process_response(r, action_result)
 
@@ -201,13 +202,13 @@ class BigfixConnector(BaseConnector):
 
         self.save_progress(consts.BIGFIX_CONNECTING_PROGRESS)
 
-        ret_val, response = self._make_rest_call('login', action_result)
+        ret_val, response = self._make_rest_call("login", action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed. Error: {0}".format(action_result.get_message()))
             return action_result.get_status()
 
-        if not response.get('response', '').startswith('ok'):
+        if not response.get("response", "").startswith("ok"):
             self.save_progress("Test Connectivity Failed. Could not get response from server.")
             return action_result.get_status()
 
@@ -219,18 +220,18 @@ class BigfixConnector(BaseConnector):
         parsed_sites = []
         for site in sites:
 
-            site_name = site['Name']
-            if site_name == 'ActionSite':
-                endpoint = 'site/master'
+            site_name = site["Name"]
+            if site_name == "ActionSite":
+                endpoint = "site/master"
             else:
-                endpoint = 'site/{0}/{1}'.format(consts.BIGFIX_SITE_TYPE_DICT[site_type], site_name)
+                endpoint = "site/{0}/{1}".format(consts.BIGFIX_SITE_TYPE_DICT[site_type], site_name)
             ret_val, response = self._make_rest_call(endpoint, action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
-            site_data = response['BES'][site_type]
-            site_data['Type'] = site_type
+            site_data = response["BES"][site_type]
+            site_data["Type"] = site_type
             parsed_sites.append(site_data)
 
         return parsed_sites
@@ -239,17 +240,16 @@ class BigfixConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        hostname = param['hostname']
-        endpoint_uri = "query?relevance=id of bes computers whose (name of it as lowercase = \"{0}\" as lowercase)".format(
-            hostname)
+        hostname = param["hostname"]
+        endpoint_uri = 'query?relevance=id of bes computers whose (name of it as lowercase = "{0}" as lowercase)'.format(hostname)
         self.debug_print("Making rest call")
-        ret_val, response = self._make_rest_call(endpoint_uri, action_result, method='get')
+        ret_val, response = self._make_rest_call(endpoint_uri, action_result, method="get")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
         try:
-            summary = response['BESAPI']['Query']['Result']['Answer']
-            ID = {'Answer': summary['#text']}
+            summary = response["BESAPI"]["Query"]["Result"]["Answer"]
+            ID = {"Answer": summary["#text"]}
             action_result.add_data(ID)
             return action_result.set_status(phantom.APP_SUCCESS, status_message=consts.SUCCESSFULLY_RETRIEVED)
         except Exception:
@@ -261,24 +261,24 @@ class BigfixConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.debug_print("Making rest call")
-        ret_val, response = self._make_rest_call('sites', action_result)
+        ret_val, response = self._make_rest_call("sites", action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         parsed_sites = []
         for site_type in consts.BIGFIX_SITE_TYPE_DICT:
 
-            sites = response.get('BESAPI', {}).get(site_type, [])
+            sites = response.get("BESAPI", {}).get(site_type, [])
             if isinstance(sites, dict):
                 sites = [sites]
 
             parsed_sites += self._parse_sites(action_result, sites, site_type)
 
-        action_result.add_data({'Sites': parsed_sites})
+        action_result.add_data({"Sites": parsed_sites})
 
         summary = action_result.update_summary({})
-        summary['num_sites'] = len(parsed_sites)
+        summary["num_sites"] = len(parsed_sites)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -287,28 +287,28 @@ class BigfixConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        site_name = param['site_name']
-        site_type = param['site_type']
+        site_name = param["site_name"]
+        site_type = param["site_type"]
         self.debug_print("Making rest call")
-        ret_val, response = self._make_rest_call('fixlets/{0}/{1}'.format(site_type, site_name), action_result)
+        ret_val, response = self._make_rest_call("fixlets/{0}/{1}".format(site_type, site_name), action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        fixlet_json = response.get('BESAPI', {}).get('Fixlet', [])
+        fixlet_json = response.get("BESAPI", {}).get("Fixlet", [])
         if isinstance(fixlet_json, dict):
             fixlet_json = [fixlet_json]
 
         fixlets = []
         for fixlet in fixlet_json:
-            fixlet['LastModified'] = fixlet.pop('@LastModified')
-            fixlet['Resource'] = fixlet.pop('@Resource')
+            fixlet["LastModified"] = fixlet.pop("@LastModified")
+            fixlet["Resource"] = fixlet.pop("@Resource")
             fixlets.append(fixlet)
 
-        action_result.add_data({'Fixlets': fixlets})
+        action_result.add_data({"Fixlets": fixlets})
 
         summary = action_result.update_summary({})
-        summary['num_fixlets'] = len(fixlets)
+        summary["num_fixlets"] = len(fixlets)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -317,37 +317,37 @@ class BigfixConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, response = self._make_rest_call('computers', action_result)
+        ret_val, response = self._make_rest_call("computers", action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        computers = response.get('BESAPI', {}).get('Computer', [])
+        computers = response.get("BESAPI", {}).get("Computer", [])
         if isinstance(computers, dict):
             computers = [computers]
 
         count = 0
         for computer in computers:
 
-            comp_id = computer['ID']
+            comp_id = computer["ID"]
             self.debug_print("Making rest call")
-            ret_val, response = self._make_rest_call('computer/{0}'.format(comp_id), action_result)
+            ret_val, response = self._make_rest_call("computer/{0}".format(comp_id), action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
-            computer_data = response.get('BESAPI', {}).get('Computer')
+            computer_data = response.get("BESAPI", {}).get("Computer")
             if not computer_data:
                 continue
 
-            for prop_dict in computer_data.pop('Property'):
-                computer_data[prop_dict['@Name']] = prop_dict['#text']
+            for prop_dict in computer_data.pop("Property"):
+                computer_data[prop_dict["@Name"]] = prop_dict["#text"]
 
             action_result.add_data(computer_data)
             count += 1
 
         summary = action_result.update_summary({})
-        summary['num_endpoints'] = count
+        summary["num_endpoints"] = count
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -356,50 +356,52 @@ class BigfixConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        site = param['site_name']
-        fixlet = param['fixlet_id']
-        action = param['action_id']
-        computers = param.get('computer_ids')
+        site = param["site_name"]
+        fixlet = param["fixlet_id"]
+        action = param["action_id"]
+        computers = param.get("computer_ids")
 
-        namespaces = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
-        root = etree.Element('BES', nsmap=namespaces, attrib={
-            '{%s}noNamespaceSchemaLocation' % 'http://www.w3.org/2001/XMLSchema-instance': 'BES.xsd'})
-        action_node = etree.SubElement(root, 'SourcedFixletAction')
-        fixlet_node = etree.SubElement(action_node, 'SourceFixlet')
+        namespaces = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}
+        root = etree.Element(
+            "BES", nsmap=namespaces, attrib={"{%s}noNamespaceSchemaLocation" % "http://www.w3.org/2001/XMLSchema-instance": "BES.xsd"}
+        )
+        action_node = etree.SubElement(root, "SourcedFixletAction")
+        fixlet_node = etree.SubElement(action_node, "SourceFixlet")
 
-        etree.SubElement(fixlet_node, 'Sitename').text = site
-        etree.SubElement(fixlet_node, 'FixletID').text = str(fixlet)
-        etree.SubElement(fixlet_node, 'Action').text = action
+        etree.SubElement(fixlet_node, "Sitename").text = site
+        etree.SubElement(fixlet_node, "FixletID").text = str(fixlet)
+        etree.SubElement(fixlet_node, "Action").text = action
 
         if computers:
 
-            target_node = etree.SubElement(action_node, 'Target')
+            target_node = etree.SubElement(action_node, "Target")
 
-            if computers.strip() == 'all':
-                etree.SubElement(target_node, 'AllComputers').text = 'true'
+            if computers.strip() == "all":
+                etree.SubElement(target_node, "AllComputers").text = "true"
             else:
-                computer_list = list(filter(None, computers.split(',')))
+                computer_list = list(filter(None, computers.split(",")))
                 for computer in computer_list:
-                    etree.SubElement(target_node, 'ComputerID').text = computer.strip()
+                    etree.SubElement(target_node, "ComputerID").text = computer.strip()
 
         self.debug_print("Making rest call")
-        ret_val, response = self._make_rest_call('actions', action_result, body=etree.tostring(root), method='post')
+        ret_val, response = self._make_rest_call("actions", action_result, body=etree.tostring(root), method="post")
 
         if phantom.is_fail(ret_val):
             return ret_val
 
-        spawned_action = response.get('BESAPI', {}).get('Action')
+        spawned_action = response.get("BESAPI", {}).get("Action")
         if not spawned_action:
-            return action_result.set_status(phantom.APP_ERROR, "Could not start action on BigFix. Return data:\n\n{0}".format(
-                response.replace('{', '{{').replace('}', '}}')))
+            return action_result.set_status(
+                phantom.APP_ERROR, "Could not start action on BigFix. Return data:\n\n{0}".format(response.replace("{", "{{").replace("}", "}}"))
+            )
 
-        spawned_action['Resource'] = spawned_action.pop('@Resource')
-        spawned_action['LastModified'] = spawned_action.pop('@LastModified')
+        spawned_action["Resource"] = spawned_action.pop("@Resource")
+        spawned_action["LastModified"] = spawned_action.pop("@LastModified")
 
-        action_result.add_data({'Action': spawned_action})
+        action_result.add_data({"Action": spawned_action})
 
         summary = action_result.update_summary({})
-        summary['spawned_action_id'] = spawned_action['ID']
+        summary["spawned_action_id"] = spawned_action["ID"]
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -412,30 +414,30 @@ class BigfixConnector(BaseConnector):
 
         self.debug_print("action_id", self.get_action_identifier())
 
-        if action_id == 'test_connectivity':
+        if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
-        elif action_id == 'list_device_groups':
+        elif action_id == "list_device_groups":
             ret_val = self._handle_list_device_groups(param)
-        elif action_id == 'list_fixlets':
+        elif action_id == "list_fixlets":
             ret_val = self._handle_list_fixlets(param)
-        elif action_id == 'list_endpoints':
+        elif action_id == "list_endpoints":
             ret_val = self._handle_list_endpoints(param)
-        elif action_id == 'run_action':
+        elif action_id == "run_action":
             ret_val = self._handle_run_action(param)
-        elif action_id == 'get_host':
+        elif action_id == "get_host":
             ret_val = self._handle_get_host(param)
 
         return ret_val
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import sys
 
     # import pudb
     # pudb.set_trace()
 
-    if (len(sys.argv) < 2):
+    if len(sys.argv) < 2:
         print("No test json specified as input")
         sys.exit(0)
 
