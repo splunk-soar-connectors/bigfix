@@ -1,2 +1,1 @@
 **Unreleased**
-* Updated dependencies to accomodate CVEs [PAPP-34725]
