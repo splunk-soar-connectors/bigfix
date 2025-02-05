@@ -6,12 +6,12 @@ Connector Version: 2.0.12
 Product Vendor: IBM  
 Product Name: BigFix  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.2.1  
+Minimum Product Version: 6.3.0  
 
 This app supports several investigative actions on IBM Big Fix
 
-### Configuration Variables
-The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a BigFix asset in SOAR.
+### Configuration variables
+This table lists the configuration variables required to operate BigFix. These variables are specified when configuring a BigFix asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
