@@ -33,11 +33,9 @@ class RetVal(tuple):
 
 
 class BigfixConnector(BaseConnector):
-
     def __init__(self):
-
         # Call the BaseConnectors init first
-        super(BigfixConnector, self).__init__()
+        super().__init__()
 
         self._auth = None
         self._state = None
@@ -45,7 +43,6 @@ class BigfixConnector(BaseConnector):
         self._base_url = None
 
     def initialize(self):
-
         config = self.get_config()
 
         self._base_url = config["url"] + ("api/" if config["url"].endswith("/") else "/api/")
@@ -56,19 +53,16 @@ class BigfixConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def finalize(self):
-
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
     def _process_empty_reponse(self, response, action_result):
-
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, consts.EMPTY_RESPONSE), None)
 
     def _process_html_response(self, response, action_result):
-
         # An html response, treat it like an error
         status_code = response.status_code
 
@@ -81,18 +75,17 @@ class BigfixConnector(BaseConnector):
         except Exception:
             error_text = consts.CANNOT_PARSE_ERROR
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = f"Status Code: {status_code}. Data from server:\n{error_text}\n"
 
         message = message.replace("{", "{{").replace("}", "}}")
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_text_response(self, r, action_result):
-
         if r.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {"response": r.text})
 
-        message = "Error from server: {0}".format(r.text.replace("{", "{{").replace("}", "}}"))
+        message = "Error from server: {}".format(r.text.replace("{", "{{").replace("}", "}}"))
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _get_error_message_from_exception(self, e):
@@ -117,30 +110,26 @@ class BigfixConnector(BaseConnector):
             error_code = consts.ERROR_CODE_EXCEPTION
             error_msg = consts.ERROR_MSG_EXCEPTIOIN
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        return f"Error Code: {error_code}. Error Message: {error_msg}"
 
     def _process_xml_response(self, r, action_result):
-
         # Try to parse a dict
         try:
             resp_json = xmltodict.parse(r.text)
         except Exception as e:
             return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(self._get_error_message_from_exception(e))
-                ),
+                action_result.set_status(phantom.APP_ERROR, f"Unable to parse XML response. Error: {self._get_error_message_from_exception(e)}"),
                 None,
             )
 
         if r.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
+        message = "Error from server. Status Code: {} Data from server: {}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
-
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, "add_debug_data"):
             action_result.add_debug_data({"r_status_code": r.status_code})
@@ -168,18 +157,17 @@ class BigfixConnector(BaseConnector):
             return self._process_empty_reponse(r, action_result)
 
         # everything else is actually an error at this point
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
+        message = "Can't process response from server. Status Code: {} Data from server: {}".format(
             r.status_code, r.text.replace("{", "{{").replace("}", "}}")
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, body=None, method="get"):
-
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), None)
 
         # Create a URL to connect to
         url = self._base_url + endpoint
@@ -188,16 +176,13 @@ class BigfixConnector(BaseConnector):
             r = request_func(url, data=body, auth=self._auth, verify=self._verify, headers={"Content-Type": "text/xml"})
         except Exception as e:
             return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))
-                ),
+                action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {self._get_error_message_from_exception(e)}"),
                 None,
             )
 
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress(consts.BIGFIX_CONNECTING_PROGRESS)
@@ -205,7 +190,7 @@ class BigfixConnector(BaseConnector):
         ret_val, response = self._make_rest_call("login", action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed. Error: {0}".format(action_result.get_message()))
+            self.save_progress(f"Test Connectivity Failed. Error: {action_result.get_message()}")
             return action_result.get_status()
 
         if not response.get("response", "").startswith("ok"):
@@ -216,15 +201,13 @@ class BigfixConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _parse_sites(self, action_result, sites, site_type):
-
         parsed_sites = []
         for site in sites:
-
             site_name = site["Name"]
             if site_name == "ActionSite":
                 endpoint = "site/master"
             else:
-                endpoint = "site/{0}/{1}".format(consts.BIGFIX_SITE_TYPE_DICT[site_type], site_name)
+                endpoint = f"site/{consts.BIGFIX_SITE_TYPE_DICT[site_type]}/{site_name}"
             ret_val, response = self._make_rest_call(endpoint, action_result)
 
             if phantom.is_fail(ret_val):
@@ -237,11 +220,11 @@ class BigfixConnector(BaseConnector):
         return parsed_sites
 
     def _handle_get_host(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         hostname = param["hostname"]
-        endpoint_uri = 'query?relevance=id of bes computers whose (name of it as lowercase = "{0}" as lowercase)'.format(hostname)
+        endpoint_uri = f'query?relevance=id of bes computers whose (name of it as lowercase = "{hostname}" as lowercase)'
         self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call(endpoint_uri, action_result, method="get")
 
@@ -256,8 +239,7 @@ class BigfixConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, status_message=consts.COULD_NOT_PARSE)
 
     def _handle_list_device_groups(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.debug_print("Making rest call")
@@ -268,7 +250,6 @@ class BigfixConnector(BaseConnector):
 
         parsed_sites = []
         for site_type in consts.BIGFIX_SITE_TYPE_DICT:
-
             sites = response.get("BESAPI", {}).get(site_type, [])
             if isinstance(sites, dict):
                 sites = [sites]
@@ -283,14 +264,13 @@ class BigfixConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_fixlets(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         site_name = param["site_name"]
         site_type = param["site_type"]
         self.debug_print("Making rest call")
-        ret_val, response = self._make_rest_call("fixlets/{0}/{1}".format(site_type, site_name), action_result)
+        ret_val, response = self._make_rest_call(f"fixlets/{site_type}/{site_name}", action_result)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -313,8 +293,7 @@ class BigfixConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_endpoints(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, response = self._make_rest_call("computers", action_result)
@@ -328,10 +307,9 @@ class BigfixConnector(BaseConnector):
 
         count = 0
         for computer in computers:
-
             comp_id = computer["ID"]
             self.debug_print("Making rest call")
-            ret_val, response = self._make_rest_call("computer/{0}".format(comp_id), action_result)
+            ret_val, response = self._make_rest_call(f"computer/{comp_id}", action_result)
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
@@ -352,8 +330,7 @@ class BigfixConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_run_action(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         site = param["site_name"]
@@ -363,7 +340,7 @@ class BigfixConnector(BaseConnector):
 
         namespaces = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}
         root = etree.Element(
-            "BES", nsmap=namespaces, attrib={"{%s}noNamespaceSchemaLocation" % "http://www.w3.org/2001/XMLSchema-instance": "BES.xsd"}
+            "BES", nsmap=namespaces, attrib={"{{{}}}noNamespaceSchemaLocation".format("http://www.w3.org/2001/XMLSchema-instance"): "BES.xsd"}
         )
         action_node = etree.SubElement(root, "SourcedFixletAction")
         fixlet_node = etree.SubElement(action_node, "SourceFixlet")
@@ -373,7 +350,6 @@ class BigfixConnector(BaseConnector):
         etree.SubElement(fixlet_node, "Action").text = action
 
         if computers:
-
             target_node = etree.SubElement(action_node, "Target")
 
             if computers.strip() == "all":
@@ -392,7 +368,7 @@ class BigfixConnector(BaseConnector):
         spawned_action = response.get("BESAPI", {}).get("Action")
         if not spawned_action:
             return action_result.set_status(
-                phantom.APP_ERROR, "Could not start action on BigFix. Return data:\n\n{0}".format(response.replace("{", "{{").replace("}", "}}"))
+                phantom.APP_ERROR, "Could not start action on BigFix. Return data:\n\n{}".format(response.replace("{", "{{").replace("}", "}}"))
             )
 
         spawned_action["Resource"] = spawned_action.pop("@Resource")
@@ -406,7 +382,6 @@ class BigfixConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
-
         ret_val = phantom.APP_SUCCESS
 
         # Get the action that we are supposed to execute for this App Run
@@ -431,7 +406,6 @@ class BigfixConnector(BaseConnector):
 
 
 if __name__ == "__main__":
-
     import sys
 
     # import pudb
