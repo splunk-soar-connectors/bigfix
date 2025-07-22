@@ -14,7 +14,7 @@
     "utctime_updated": "2025-05-12T23:03:03.481441Z",
     "package_name": "phantom_bigfix",
     "main_module": "bigfix_connector.py",
-    "python_version": "3",
+    "python_version": ["3.9", "3.13"],
     "fips_compliant": true,
     "min_phantom_version": "6.3.0",
     "latest_tested_versions": [
