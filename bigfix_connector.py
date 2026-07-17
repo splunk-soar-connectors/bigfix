@@ -119,6 +119,9 @@ class BigfixConnector(BaseConnector):
         return f"Error Code: {error_code}. Error Message: {error_msg}"
 
     def _process_xml_response(self, r, action_result):
+        if "<!DOCTYPE" in r.text.upper():
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "XML document type declarations are not allowed"), None)
+
         # Try to parse a dict
         try:
             resp_json = xmltodict.parse(r.text)
@@ -134,6 +137,36 @@ class BigfixConnector(BaseConnector):
         message = "Error from server. Status Code: {} Data from server: {}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _materialize_bounded_response(self, response, action_result):
+        """Read a streamed response without allowing an oversized body into memory."""
+        content_length = response.headers.get("Content-Length")
+        if content_length:
+            try:
+                if int(content_length) > consts.MAX_RESPONSE_BYTES:
+                    return action_result.set_status(phantom.APP_ERROR, "BigFix response exceeds the 5 MiB processing limit")
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR, "BigFix returned an invalid Content-Length header")
+
+        content = bytearray()
+        try:
+            for chunk in response.iter_content(chunk_size=64 * 1024):
+                if not chunk:
+                    continue
+                content.extend(chunk)
+                if len(content) > consts.MAX_RESPONSE_BYTES:
+                    return action_result.set_status(phantom.APP_ERROR, "BigFix response exceeds the 5 MiB processing limit")
+        except Exception as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Unable to read BigFix response: {self._get_error_message_from_exception(e)}",
+            )
+        finally:
+            response.close()
+
+        response._content = bytes(content)
+        response._content_consumed = True
+        return phantom.APP_SUCCESS
 
     def _process_response(self, r, action_result):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
@@ -179,12 +212,16 @@ class BigfixConnector(BaseConnector):
         url = self._base_url + endpoint
 
         try:
-            r = request_func(url, data=body, auth=self._auth, verify=self._verify, headers={"Content-Type": "text/xml"})
+            r = request_func(url, data=body, auth=self._auth, verify=self._verify, headers={"Content-Type": "text/xml"}, stream=True)
         except Exception as e:
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {self._get_error_message_from_exception(e)}"),
                 None,
             )
+
+        ret_val = self._materialize_bounded_response(r, action_result)
+        if phantom.is_fail(ret_val):
+            return RetVal(action_result.get_status(), None)
 
         return self._process_response(r, action_result)
 

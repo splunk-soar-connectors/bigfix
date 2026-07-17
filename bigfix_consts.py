@@ -21,3 +21,4 @@ COULD_NOT_PARSE = "Could not parse reply"
 TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed"
 ERROR_CODE_EXCEPTION = "Error code unavailable"
 ERROR_MSG_EXCEPTIOIN = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+MAX_RESPONSE_BYTES = 5 * 1024 * 1024
