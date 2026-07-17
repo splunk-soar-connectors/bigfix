@@ -15,6 +15,7 @@
 #
 #
 import json
+import urllib.parse as urlparse
 
 import phantom.app as phantom
 import requests
@@ -30,6 +31,11 @@ import bigfix_consts as consts
 class RetVal(tuple):
     def __new__(cls, val1, val2):
         return tuple.__new__(RetVal, (val1, val2))
+
+
+def _quote_path_segment(value):
+    """Encode an action-supplied identifier as one URL path segment."""
+    return urlparse.quote(str(value), safe="").replace(".", "%2E")
 
 
 class BigfixConnector(BaseConnector):
@@ -267,8 +273,11 @@ class BigfixConnector(BaseConnector):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        site_name = param["site_name"]
-        site_type = param["site_type"]
+        site_name = _quote_path_segment(param["site_name"])
+        site_type = str(param["site_type"]).lower()
+        valid_site_types = {"master", "custom", "external", "operator"}
+        if site_type not in valid_site_types:
+            return action_result.set_status(phantom.APP_ERROR, "Site type must be master, custom, external, or operator")
         self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call(f"fixlets/{site_type}/{site_name}", action_result)
 
