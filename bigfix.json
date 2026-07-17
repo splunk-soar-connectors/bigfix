@@ -29,7 +29,7 @@
             "order": 0
         },
         "verify_server_cert": {
-            "description": "Verify server certificate",
+            "description": "Verify the server certificate (enabled by default; configure a CA bundle for private certificate authorities)",
             "data_type": "boolean",
             "default": true,
             "order": 1
