@@ -267,7 +267,10 @@ class BigfixConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         hostname = param["hostname"]
-        endpoint_uri = f'query?relevance=id of bes computers whose (name of it as lowercase = "{hostname}" as lowercase)'
+        if '"' in hostname:
+            return action_result.set_status(phantom.APP_ERROR, "Hostname cannot contain a double quote")
+        relevance = f'id of bes computers whose (name of it as lowercase = "{hostname}" as lowercase)'
+        endpoint_uri = f"query?{urlparse.urlencode({'relevance': relevance})}"
         self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call(endpoint_uri, action_result, method="get")
 
