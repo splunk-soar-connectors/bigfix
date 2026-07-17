@@ -47,7 +47,7 @@ class BigfixConnector(BaseConnector):
 
         self._base_url = config["url"] + ("api/" if config["url"].endswith("/") else "/api/")
         self._auth = (config["username"], config["password"])
-        self._verify = config["verify_server_cert"]
+        self._verify = config.get("verify_server_cert", True)
         self._state = self.load_state()
 
         return phantom.APP_SUCCESS
