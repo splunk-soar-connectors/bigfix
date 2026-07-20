@@ -1,9 +1,9 @@
 # BigFix
 
-Publisher: Splunk \
-Connector Version: 2.0.16 \
-Product Vendor: IBM \
-Product Name: BigFix \
+Publisher: Splunk <br>
+Connector Version: 2.0.16 <br>
+Product Vendor: IBM <br>
+Product Name: BigFix <br>
 Minimum Product Version: 6.3.0
 
 This app supports several investigative actions on IBM Big Fix
@@ -15,24 +15,24 @@ This table lists the configuration variables required to operate BigFix. These v
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **url** | required | string | URL including port |
-**verify_server_cert** | optional | boolean | Verify server certificate |
+**verify_server_cert** | optional | boolean | Verify the server certificate (enabled by default; configure a CA bundle for private certificate authorities) |
 **username** | required | string | Username |
 **password** | required | password | Password |
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
-[list device groups](#action-list-device-groups) - List all sites on the system \
-[list patches](#action-list-patches) - List patches from a site \
-[list endpoints](#action-list-endpoints) - List all endpoints connected to the system \
-[deploy patch](#action-deploy-patch) - Deploy a patch \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
+[list device groups](#action-list-device-groups) - List all sites on the system <br>
+[list patches](#action-list-patches) - List patches from a site <br>
+[list endpoints](#action-list-endpoints) - List all endpoints connected to the system <br>
+[deploy patch](#action-deploy-patch) - Deploy a patch <br>
 [get host](#action-get-host) - Get Bigfix ID
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity using supplied configuration
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -47,7 +47,7 @@ No Output
 
 List all sites on the system
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -80,7 +80,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List patches from a site
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action lists all fixlets on a given site.
@@ -112,7 +112,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List all endpoints connected to the system
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -163,7 +163,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Deploy a patch
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 Create an action on BigFix that will run the given action from the given fixlet.<br><br>The <b>computer_ids</b> parameter takes a comma-separated list of BigFix computer IDs. If no computers are given, the action will be run on the default computers configured on BigFix. If the action should run on all computers set the <b>computer_ids</b> parameter to <b>all</b>.
@@ -199,7 +199,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get Bigfix ID
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Get BigFix ID from Hostname.
@@ -226,7 +226,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

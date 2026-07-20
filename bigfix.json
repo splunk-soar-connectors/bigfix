@@ -9,7 +9,7 @@
     "product_name": "BigFix",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2017-2025 Splunk Inc.",
+    "license": "Copyright (c) 2017-2026 Splunk Inc.",
     "app_version": "2.0.16",
     "utctime_updated": "2025-08-01T20:28:08.625901Z",
     "package_name": "phantom_bigfix",
@@ -29,9 +29,9 @@
             "order": 0
         },
         "verify_server_cert": {
-            "description": "Verify server certificate",
+            "description": "Verify the server certificate (enabled by default; configure a CA bundle for private certificate authorities)",
             "data_type": "boolean",
-            "default": false,
+            "default": true,
             "order": 1
         },
         "username": {

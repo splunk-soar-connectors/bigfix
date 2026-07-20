@@ -1,6 +1,6 @@
 # File: bigfix_consts.py
 #
-# Copyright (c) 2017-2025 Splunk Inc.
+# Copyright (c) 2017-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,3 +21,4 @@ COULD_NOT_PARSE = "Could not parse reply"
 TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed"
 ERROR_CODE_EXCEPTION = "Error code unavailable"
 ERROR_MSG_EXCEPTIOIN = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+MAX_RESPONSE_BYTES = 5 * 1024 * 1024

@@ -1,6 +1,6 @@
 # File: bigfix_connector.py
 #
-# Copyright (c) 2017-2025 Splunk Inc.
+# Copyright (c) 2017-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #
 #
 import json
+import urllib.parse as urlparse
 
 import phantom.app as phantom
 import requests
@@ -32,6 +33,11 @@ class RetVal(tuple):
         return tuple.__new__(RetVal, (val1, val2))
 
 
+def _quote_path_segment(value):
+    """Encode an action-supplied identifier as one URL path segment."""
+    return urlparse.quote(str(value), safe="").replace(".", "%2E")
+
+
 class BigfixConnector(BaseConnector):
     def __init__(self):
         # Call the BaseConnectors init first
@@ -47,7 +53,7 @@ class BigfixConnector(BaseConnector):
 
         self._base_url = config["url"] + ("api/" if config["url"].endswith("/") else "/api/")
         self._auth = (config["username"], config["password"])
-        self._verify = config["verify_server_cert"]
+        self._verify = config.get("verify_server_cert", True)
         self._state = self.load_state()
 
         return phantom.APP_SUCCESS
@@ -113,6 +119,9 @@ class BigfixConnector(BaseConnector):
         return f"Error Code: {error_code}. Error Message: {error_msg}"
 
     def _process_xml_response(self, r, action_result):
+        if "<!DOCTYPE" in r.text.upper():
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "XML document type declarations are not allowed"), None)
+
         # Try to parse a dict
         try:
             resp_json = xmltodict.parse(r.text)
@@ -128,6 +137,36 @@ class BigfixConnector(BaseConnector):
         message = "Error from server. Status Code: {} Data from server: {}".format(r.status_code, r.text.replace("{", "{{").replace("}", "}}"))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _materialize_bounded_response(self, response, action_result):
+        """Read a streamed response without allowing an oversized body into memory."""
+        content_length = response.headers.get("Content-Length")
+        if content_length:
+            try:
+                if int(content_length) > consts.MAX_RESPONSE_BYTES:
+                    return action_result.set_status(phantom.APP_ERROR, "BigFix response exceeds the 5 MiB processing limit")
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR, "BigFix returned an invalid Content-Length header")
+
+        content = bytearray()
+        try:
+            for chunk in response.iter_content(chunk_size=64 * 1024):
+                if not chunk:
+                    continue
+                content.extend(chunk)
+                if len(content) > consts.MAX_RESPONSE_BYTES:
+                    return action_result.set_status(phantom.APP_ERROR, "BigFix response exceeds the 5 MiB processing limit")
+        except Exception as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Unable to read BigFix response: {self._get_error_message_from_exception(e)}",
+            )
+        finally:
+            response.close()
+
+        response._content = bytes(content)
+        response._content_consumed = True
+        return phantom.APP_SUCCESS
 
     def _process_response(self, r, action_result):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
@@ -173,12 +212,16 @@ class BigfixConnector(BaseConnector):
         url = self._base_url + endpoint
 
         try:
-            r = request_func(url, data=body, auth=self._auth, verify=self._verify, headers={"Content-Type": "text/xml"})
+            r = request_func(url, data=body, auth=self._auth, verify=self._verify, headers={"Content-Type": "text/xml"}, stream=True)
         except Exception as e:
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {self._get_error_message_from_exception(e)}"),
                 None,
             )
+
+        ret_val = self._materialize_bounded_response(r, action_result)
+        if phantom.is_fail(ret_val):
+            return RetVal(action_result.get_status(), None)
 
         return self._process_response(r, action_result)
 
@@ -224,7 +267,10 @@ class BigfixConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         hostname = param["hostname"]
-        endpoint_uri = f'query?relevance=id of bes computers whose (name of it as lowercase = "{hostname}" as lowercase)'
+        if '"' in hostname:
+            return action_result.set_status(phantom.APP_ERROR, "Hostname cannot contain a double quote")
+        relevance = f'id of bes computers whose (name of it as lowercase = "{hostname}" as lowercase)'
+        endpoint_uri = f"query?{urlparse.urlencode({'relevance': relevance})}"
         self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call(endpoint_uri, action_result, method="get")
 
@@ -267,8 +313,11 @@ class BigfixConnector(BaseConnector):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        site_name = param["site_name"]
-        site_type = param["site_type"]
+        site_name = _quote_path_segment(param["site_name"])
+        site_type = str(param["site_type"]).lower()
+        valid_site_types = {"master", "custom", "external", "operator"}
+        if site_type not in valid_site_types:
+            return action_result.set_status(phantom.APP_ERROR, "Site type must be master, custom, external, or operator")
         self.debug_print("Making rest call")
         ret_val, response = self._make_rest_call(f"fixlets/{site_type}/{site_name}", action_result)
 
