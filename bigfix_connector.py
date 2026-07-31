@@ -313,7 +313,10 @@ class BigfixConnector(BaseConnector):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        site_name = _quote_path_segment(param["site_name"])
+        raw_site_name = str(param["site_name"])
+        if raw_site_name in {".", ".."}:
+            return action_result.set_status(phantom.APP_ERROR, "Site name cannot be a dot path segment")
+        site_name = _quote_path_segment(raw_site_name)
         site_type = str(param["site_type"]).lower()
         valid_site_types = {"master", "custom", "external", "operator"}
         if site_type not in valid_site_types:
