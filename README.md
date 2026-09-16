@@ -1,7 +1,7 @@
 # BigFix
 
 Publisher: Splunk <br>
-Connector Version: 2.0.18 <br>
+Connector Version: 2.0.19 <br>
 Product Vendor: IBM <br>
 Product Name: BigFix <br>
 Minimum Product Version: 6.3.0
